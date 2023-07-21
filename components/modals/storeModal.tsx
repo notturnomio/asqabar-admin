@@ -1,10 +1,6 @@
 'use client';
 
-import { Modal } from '@/components/ui/modal';
-import { useStoreModal } from '@/hooks/useStoreModal';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { set, useForm } from 'react-hook-form';
-import * as z from 'zod';
+import { Button } from '@/components/ui/button';
 import {
   Form,
   FormControl,
@@ -14,11 +10,15 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { POST } from '@/app/api/stores/route';
-import { useState } from 'react';
+import { Modal } from '@/components/ui/modal';
+import { useStoreModal } from '@/hooks/useStoreModal';
+import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import { redirect } from 'next/navigation';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import * as z from 'zod';
 
 const formSchema = z.object({
   name: z.string().min(3).max(64),
@@ -39,8 +39,7 @@ export const StoreModal = () => {
     try {
       setLoading(true);
       const response = await axios.post('/api/stores', values);
-      toast.success('Store created');
-      console.log(response.data);
+      window.location.assign(`/${response.data.id}`);
     } catch (error) {
       toast.error('Something went wrong');
       console.log(error);

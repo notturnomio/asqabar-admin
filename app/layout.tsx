@@ -1,9 +1,9 @@
 import { ModalProvider } from '@/providers/modalProvider';
+import { ToasterProvider } from '@/providers/toastProvider';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { ToasterProvider } from '@/providers/toastProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 

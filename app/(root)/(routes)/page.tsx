@@ -1,10 +1,10 @@
 'use client';
 
 import { useStoreModal } from '@/hooks/useStoreModal';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const RootPage = () => {
-  const [isClient, setIsClient] = useState(false);
+  // const [isClient, setIsClient] = useState(false);
   const onOpen = useStoreModal((state) => state.onOpen);
   const isOpen = useStoreModal((state) => state.isOpen);
 
@@ -15,7 +15,7 @@ const RootPage = () => {
     }
   }, [isOpen, onOpen]);
 
-  return <>{isClient ? <div className='p-4'>Root page</div> : null}</>;
+  return null;
 };
 
 export default RootPage;
