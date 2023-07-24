@@ -35,7 +35,7 @@ const formSchema = z.object({
 
 type SettingsFormValues = z.infer<typeof formSchema>;
 
-const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
+export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
   const origin = useOrigin();
@@ -65,7 +65,6 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     try {
       setLoading(true);
       await axios.delete(`/api/stores/${params.storeId}`);
-      setOpen(false);
       router.refresh();
       router.push('/');
       toast.success('Store deleted');
@@ -81,14 +80,12 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
 
   return (
     <>
-      {open && (
-        <AlertModal
-          isOpen={open}
-          onClose={() => setOpen(false)}
-          onConfirm={onDelete}
-          loading={loading}
-        />
-      )}
+      <AlertModal
+        isOpen={open}
+        onClose={() => setOpen(false)}
+        onConfirm={onDelete}
+        loading={loading}
+      />
       <div className='flex items-center justify-between'>
         <Heading
           title='Settings'
@@ -149,5 +146,3 @@ const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
     </>
   );
 };
-
-export default SettingsForm;

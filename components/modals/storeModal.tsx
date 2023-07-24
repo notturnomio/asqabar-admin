@@ -14,7 +14,6 @@ import { Modal } from '@/components/ui/modal';
 import { useStoreModal } from '@/hooks/useStoreModal';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
@@ -25,7 +24,7 @@ const formSchema = z.object({
 });
 
 export const StoreModal = () => {
-  const { isOpen, onClose } = useStoreModal();
+  const storeModal = useStoreModal();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -51,8 +50,8 @@ export const StoreModal = () => {
     <Modal
       title='Create store'
       description='Add a new store to manage products and categories'
-      isOpen={isOpen}
-      onClose={onClose}
+      isOpen={storeModal.isOpen}
+      onClose={storeModal.onClose}
     >
       <div>
         <div className='space-y-4 py-2 pb-4'>
@@ -76,7 +75,11 @@ export const StoreModal = () => {
                 )}
               />
               <div className='pt-6 space-x-2 flex items-center justify-end w-full'>
-                <Button variant='outline' onClick={onClose} disabled={loading}>
+                <Button
+                  variant='outline'
+                  onClick={storeModal.onClose}
+                  disabled={loading}
+                >
                   Cancel
                 </Button>
                 <Button type='submit' disabled={loading}>

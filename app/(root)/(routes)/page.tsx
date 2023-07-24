@@ -3,13 +3,11 @@
 import { useStoreModal } from '@/hooks/useStoreModal';
 import { useEffect } from 'react';
 
-const RootPage = () => {
-  // const [isClient, setIsClient] = useState(false);
+const SetupPage = () => {
   const onOpen = useStoreModal((state) => state.onOpen);
   const isOpen = useStoreModal((state) => state.isOpen);
 
   useEffect(() => {
-    // setIsClient(true);
     if (!isOpen) {
       onOpen();
     }
@@ -18,4 +16,4 @@ const RootPage = () => {
   return null;
 };
 
-export default RootPage;
+export default SetupPage;

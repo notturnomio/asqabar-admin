@@ -1,12 +1,12 @@
 'use client';
 
-import { DialogTitle } from '@radix-ui/react-dialog';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
-} from '@/components/ui/dialog';
+  DialogTitle,
+} from '@radix-ui/react-dialog';
+import { DialogHeader } from './dialog';
 
 interface ModalProps {
   children?: React.ReactNode;

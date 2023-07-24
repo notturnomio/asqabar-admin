@@ -24,6 +24,7 @@ import {
   PlusCircle,
   Store as StoreIcon,
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -35,10 +36,7 @@ interface StoreSwitcherProps extends PopoverTriggerProps {
   items: Store[];
 }
 
-export default function StoreSwitcher({
-  className,
-  items = [],
-}: StoreSwitcherProps) {
+function StoreSwitcher({ className, items = [] }: StoreSwitcherProps) {
   const storeModal = useStoreModal();
   const params = useParams();
   const router = useRouter();
@@ -120,3 +118,5 @@ export default function StoreSwitcher({
     </Popover>
   );
 }
+
+export default dynamic(() => Promise.resolve(StoreSwitcher), { ssr: false });

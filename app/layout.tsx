@@ -1,5 +1,5 @@
 import { ModalProvider } from '@/providers/modalProvider';
-import { ToasterProvider } from '@/providers/toastProvider';
+import ToasterProvider from '@/providers/toastProvider';
 import { ClerkProvider } from '@clerk/nextjs';
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard',
-  description: 'Asqabar - Admin Dashboard',
+  description: 'Asqabar E-Commerce Dashboard',
 };
 
 export default function RootLayout({

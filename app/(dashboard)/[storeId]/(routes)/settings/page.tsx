@@ -1,8 +1,8 @@
 import prismadb from '@/lib/prismadb';
 import { auth } from '@clerk/nextjs';
-import { Settings } from 'lucide-react';
+// import { Settings } from 'lucide-react';
 import { redirect } from 'next/navigation';
-import SettingsForm from './components/settingsForm';
+import { SettingsForm } from './components/settingsForm';
 
 interface SettingPageProps {
   params: {

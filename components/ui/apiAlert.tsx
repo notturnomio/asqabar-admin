@@ -1,5 +1,3 @@
-'use client';
-
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge, BadgeProps } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,7 +23,7 @@ const variantMap: Record<ApiAlertProps['variant'], BadgeProps['variant']> = {
 export const ApiAlert: React.FC<ApiAlertProps> = ({
   title,
   description,
-  variant,
+  variant = 'public',
 }) => {
   const onCopy = () => {
     navigator.clipboard.writeText(description);
