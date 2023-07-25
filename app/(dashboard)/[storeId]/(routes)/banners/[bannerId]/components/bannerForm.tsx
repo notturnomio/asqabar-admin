@@ -1,7 +1,6 @@
 'use client';
 
 import { AlertModal } from '@/components/modals/alertModal';
-import { ApiAlert } from '@/components/ui/apiAlert';
 import { Button } from '@/components/ui/button';
 import {
   Form,
@@ -12,11 +11,11 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
+import ImageUpload from '@/components/ui/imageUpload';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { useOrigin } from '@/hooks/useOrigin';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Store } from '@prisma/client';
+import { Banner } from '@prisma/client';
 import axios from 'axios';
 import { Settings, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -26,34 +25,50 @@ import toast from 'react-hot-toast';
 import * as z from 'zod';
 
 const formSchema = z.object({
-  name: z.string().min(3).max(64),
+  label: z.string().min(3).max(64),
+  imageUrl: z.string().url(),
 });
 
-type SettingsFormValues = z.infer<typeof formSchema>;
+type BannerFormValues = z.infer<typeof formSchema>;
 
-interface SettingsFormProps {
-  initialData: Store;
+interface BannerFormProps {
+  initialData: Banner | null;
 }
 
-export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
+export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
   const params = useParams();
   const router = useRouter();
-  const origin = useOrigin();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<SettingsFormValues>({
+  const title = initialData ? 'Edit Banner' : 'New Banner';
+  const description = initialData ? 'Edit your banner' : 'Create a new banner';
+  const toastMessage = initialData ? 'Banner updated' : 'Banner created';
+  const action = initialData ? 'Save changes' : 'Create';
+
+  const form = useForm<BannerFormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: initialData,
+    defaultValues: initialData || {
+      label: '',
+      imageUrl: '',
+    },
   });
 
-  const onSubmit = async (data: SettingsFormValues) => {
+  const onSubmit = async (data: BannerFormValues) => {
     try {
       setLoading(true);
-      await axios.patch(`/api/stores/${params.storeId}`, data);
+      if (initialData) {
+        await axios.patch(
+          `/api/${params.storeId}/banners/${params.bannerId}`,
+          data
+        );
+      } else {
+        await axios.post(`/api/${params.storeId}/banners`, data);
+      }
       router.refresh();
-      toast.success('Store updated');
+      router.push(`/${params.storeId}/banners`);
+      toast.success(toastMessage);
     } catch (error) {
       toast.error('Something went wrong');
     } finally {
@@ -64,14 +79,12 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/stores/${params.storeId}`);
+      await axios.delete(`/api/${params.storeId}/banners/${params.bannerId}}`);
       router.refresh();
       router.push('/');
-      toast.success('Store deleted');
+      toast.success('Banner deleted');
     } catch (error) {
-      toast.error(
-        'Make sure you have no products and categories in your store'
-      );
+      toast.error('Make sure you have no categories using this banner');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -87,20 +100,18 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
         loading={loading}
       />
       <div className='flex items-center justify-between'>
-        <Heading
-          title='Settings'
-          description='Manage Store Preferences'
-          icon={<Settings />}
-        />
-        <Button
-          disabled={loading}
-          variant='destructive'
-          size='sm'
-          onClick={() => setOpen(true)}
-        >
-          <Trash className='mr-2 h-4 w-4' />
-          Delete store
-        </Button>
+        <Heading title={title} description={description} icon={<Settings />} />
+        {initialData && (
+          <Button
+            disabled={loading}
+            variant='destructive'
+            size='sm'
+            onClick={() => setOpen(true)}
+          >
+            <Trash className='mr-2 h-4 w-4' />
+            Delete store
+          </Button>
+        )}
       </div>
       <Separator />
       <Form {...form}>
@@ -108,17 +119,35 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
           className='space-y-8 w-full'
           onSubmit={form.handleSubmit(onSubmit)}
         >
+          <FormField
+            name='imageUrl'
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Background Image</FormLabel>
+                <FormControl>
+                  <ImageUpload
+                    value={field.value ? [field.value] : []}
+                    disabled={loading}
+                    onChange={(url) => field.onChange(url)}
+                    onRemove={() => field.onChange('')}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           <div className='grid grid-cols-3 gap-8'>
             <FormField
-              name='name'
+              name='label'
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>Label</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder='Store name'
+                      placeholder='Banner label'
                       {...field}
                     />
                   </FormControl>
@@ -133,16 +162,11 @@ export const SettingsForm: React.FC<SettingsFormProps> = ({ initialData }) => {
             variant='default'
             type='submit'
           >
-            Save changes
+            {action}
           </Button>
         </form>
       </Form>
       <Separator />
-      <ApiAlert
-        title='NEXT_PUBLIC_API_URL'
-        description={`${origin}/api/${params.storeId}`}
-        variant='public'
-      />
     </>
   );
 };
