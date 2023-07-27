@@ -19,7 +19,7 @@ import { Banner } from '@prisma/client';
 import axios from 'axios';
 import { Settings, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import * as z from 'zod';
@@ -36,11 +36,16 @@ interface BannerFormProps {
 }
 
 export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
-  const params = useParams();
-  const router = useRouter();
-
+  const [isMounted, setIsMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
+  const params = useParams();
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const title = initialData ? 'Edit Banner' : 'New Banner';
   const description = initialData ? 'Edit your banner' : 'Create a new banner';
@@ -81,7 +86,7 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
       setLoading(true);
       await axios.delete(`/api/${params.storeId}/banners/${params.bannerId}}`);
       router.refresh();
-      router.push('/');
+      router.push(`/${params.storeId}/banners}`);
       toast.success('Banner deleted');
     } catch (error) {
       toast.error('Make sure you have no categories using this banner');
@@ -90,6 +95,10 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
       setOpen(false);
     }
   };
+
+  if (!isMounted) {
+    return null;
+  }
 
   return (
     <>
@@ -166,7 +175,6 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
           </Button>
         </form>
       </Form>
-      <Separator />
     </>
   );
 };

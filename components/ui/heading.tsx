@@ -1,7 +1,7 @@
 interface HeadingProps {
   title: string;
   description: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
 }
 
 export const Heading: React.FC<HeadingProps> = ({
