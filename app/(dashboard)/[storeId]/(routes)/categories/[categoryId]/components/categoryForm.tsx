@@ -11,11 +11,17 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Heading } from '@/components/ui/heading';
-import ImageUpload from '@/components/ui/imageUpload';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Banner } from '@prisma/client';
+import { Banner, Category } from '@prisma/client';
 import axios from 'axios';
 import { Edit, Trash } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
@@ -25,17 +31,21 @@ import toast from 'react-hot-toast';
 import * as z from 'zod';
 
 const formSchema = z.object({
-  label: z.string().min(3).max(64),
-  imageUrl: z.string().url(),
+  name: z.string().min(3).max(64),
+  bannerId: z.string().min(3).max(64),
 });
 
-type BannerFormValues = z.infer<typeof formSchema>;
+type CategoryFormValues = z.infer<typeof formSchema>;
 
-interface BannerFormProps {
-  initialData: Banner | null;
+interface CategoryFormProps {
+  initialData: Category | null;
+  banners: Banner[];
 }
 
-export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
+export const CategoryForm: React.FC<CategoryFormProps> = ({
+  initialData,
+  banners,
+}) => {
   const [isMounted, setIsMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -47,32 +57,34 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
     setIsMounted(true);
   }, []);
 
-  const title = initialData ? 'Edit Banner' : 'New Banner';
-  const description = initialData ? 'Edit your banner' : 'Create a new banner';
-  const toastMessage = initialData ? 'Banner updated' : 'Banner created';
+  const title = initialData ? 'Edit Category' : 'New Category';
+  const description = initialData
+    ? 'Edit your category'
+    : 'Create a new category';
+  const toastMessage = initialData ? 'Category updated' : 'Category created';
   const action = initialData ? 'Save changes' : 'Create';
 
-  const form = useForm<BannerFormValues>({
+  const form = useForm<CategoryFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: '',
-      imageUrl: '',
+      name: '',
+      bannerId: '',
     },
   });
 
-  const onSubmit = async (data: BannerFormValues) => {
+  const onSubmit = async (data: CategoryFormValues) => {
     try {
       setLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/banners/${params.bannerId}`,
+          `/api/${params.storeId}/categories/${params.categoryId}`,
           data
         );
       } else {
-        await axios.post(`/api/${params.storeId}/banners`, data);
+        await axios.post(`/api/${params.storeId}/categories`, data);
       }
       router.refresh();
-      router.push(`/${params.storeId}/banners`);
+      router.push(`/${params.storeId}/categories`);
       toast.success(toastMessage);
     } catch (error) {
       toast.error('Something went wrong');
@@ -84,12 +96,14 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
   const onDelete = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/${params.storeId}/banners/${params.bannerId}`);
+      await axios.delete(
+        `/api/${params.storeId}/categories/${params.categoryId}`
+      );
       router.refresh();
-      router.push(`/${params.storeId}/banners`);
-      toast.success('Banner deleted');
+      router.push(`/${params.storeId}/categories`);
+      toast.success('Category deleted');
     } catch (error) {
-      toast.error('Make sure you have no categories using this banner');
+      toast.error('Make sure you have no products using this category');
     } finally {
       setLoading(false);
       setOpen(false);
@@ -118,7 +132,7 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
             onClick={() => setOpen(true)}
           >
             <Trash className='mr-2 h-4 w-4' />
-            Delete store
+            Delete category
           </Button>
         )}
       </div>
@@ -128,38 +142,52 @@ export const BannerForm: React.FC<BannerFormProps> = ({ initialData }) => {
           className='space-y-8 w-full'
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
-            name='imageUrl'
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Background Image</FormLabel>
-                <FormControl>
-                  <ImageUpload
-                    value={field.value ? [field.value] : []}
-                    disabled={loading}
-                    onChange={(url) => field.onChange(url)}
-                    onRemove={() => field.onChange('')}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
           <div className='grid grid-cols-3 gap-8'>
             <FormField
-              name='label'
+              name='name'
               control={form.control}
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Label</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
                     <Input
                       disabled={loading}
-                      placeholder='Banner label'
+                      placeholder='Category name'
                       {...field}
                     />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name='bannerId'
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Banner</FormLabel>
+                  <Select
+                    disabled={loading}
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue
+                          defaultValue={field.value}
+                          placeholder='Select a banner'
+                        />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {banners.map((banner) => (
+                        <SelectItem key={banner.id} value={banner.id}>
+                          {banner.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
