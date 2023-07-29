@@ -10,11 +10,11 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { CategoryColumn, columns } from './columns';
 
-interface CategoryClientProps {
+interface CategoriesClientProps {
   data: CategoryColumn[];
 }
 
-export const CategoryClient: React.FC<CategoryClientProps> = ({ data }) => {
+export const CategoriesClient: React.FC<CategoriesClientProps> = ({ data }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();

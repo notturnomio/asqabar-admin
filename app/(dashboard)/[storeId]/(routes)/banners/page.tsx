@@ -1,6 +1,6 @@
 import prismadb from '@/lib/prismadb';
 import { format } from 'date-fns';
-import { BannerClient } from './components/client';
+import { BannersClient } from './components/client';
 import { BannerColumn } from './components/columns';
 
 const BannersPage = async ({ params }: { params: { storeId: string } }) => {
@@ -17,7 +17,7 @@ const BannersPage = async ({ params }: { params: { storeId: string } }) => {
 
   return (
     <div className='flex-1 space-y-4 p-8 pt-6'>
-      <BannerClient data={formattedBanners} />
+      <BannersClient data={formattedBanners} />
     </div>
   );
 };

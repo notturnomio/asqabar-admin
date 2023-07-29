@@ -5,16 +5,16 @@ import { Button } from '@/components/ui/button';
 import { DataTable } from '@/components/ui/dataTable';
 import { Heading } from '@/components/ui/heading';
 import { Separator } from '@/components/ui/separator';
-import { Forward, Image as ImageIcon, Plus } from 'lucide-react';
+import { Forward, Plus, Ruler } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BannerColumn, columns } from './columns';
+import { SizeColumn, columns } from './columns';
 
-interface BannersClientProps {
-  data: BannerColumn[];
+interface SizesClientProps {
+  data: SizeColumn[];
 }
 
-export const BannersClient: React.FC<BannersClientProps> = ({ data }) => {
+export const SizesClient: React.FC<SizesClientProps> = ({ data }) => {
   const [isMounted, setIsMounted] = useState(false);
 
   const router = useRouter();
@@ -32,24 +32,24 @@ export const BannersClient: React.FC<BannersClientProps> = ({ data }) => {
     <>
       <div className='flex items-center justify-between'>
         <Heading
-          title={`Banners (${data.length})`}
-          description='Manage banners for your store'
-          icon={<ImageIcon />}
+          title={`Sizes (${data.length})`}
+          description='Manage sizes for your store'
+          icon={<Ruler />}
         />
-        <Button onClick={() => router.push(`/${params.storeId}/banners/new`)}>
+        <Button onClick={() => router.push(`/${params.storeId}/sizes/new`)}>
           <Plus className='mr-2 h-4 w-4' />
           Add New
         </Button>
       </div>
       <Separator />
-      <DataTable columns={columns} data={data} filterKey='label' />
+      <DataTable columns={columns} data={data} filterKey='name' />
       <Heading
         title='API'
-        description='API calls for Banners'
+        description='API calls for Sizes'
         icon={<Forward />}
       />
       <Separator />
-      <ApiList entityName='banners' entityIdName='bannerId' />
+      <ApiList entityName='sizes' entityIdName='sizeId' />
     </>
   );
 };
